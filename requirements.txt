@@ -1,0 +1,7 @@
+langchain
+llama-index
+sentence-transformers
+faiss-cpu
+pypdf
+streamlit
+pandas
