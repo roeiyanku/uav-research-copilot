@@ -1,44 +1,116 @@
 # UAV Research Copilot
 
-A small Retrieval-Augmented Generation (RAG) project for querying UAV research papers.
+A lightweight Python Retrieval-Augmented Generation (RAG) project for querying UAV research papers stored as local PDFs.
 
-## Goal
-Load PDFs from `data/papers/`, chunk them, embed them, retrieve relevant chunks, 
-and answer questions using an LLM.
+## Features
+
+- Loads PDF papers from `data/papers/`
+- Chunks documents with overlap for better retrieval quality
+- Builds lightweight local embeddings
+- Stores vectors in a local NumPy vector database (`data/vector_store/`)
+- Runs a RAG question-answering pipeline and returns source chunks
+- Keeps prompt templates in a dedicated `prompts.py` module
+- Evaluates at least two prompt styles (`precise` vs `structured`)
+- Saves evaluation output to `results/eval_results.csv`
+- Includes a Streamlit app for interactive QA and source inspection
 
 ## Project Structure
 
+```text
 uav-research-copilot/
-├── data/
-│   └── papers/
-├── src/
-│   ├── ingest.py
-│   ├── rag_pipeline.py
-│   ├── prompts.py
-│   └── evaluate.py
 ├── app.py
+├── ingest.py
+├── rag_pipeline.py
+├── evaluate.py
+├── prompts.py
 ├── requirements.txt
-└── README.md
+├── README.md
+├── data/
+│   ├── papers/
+│   └── vector_store/
+├── results/
+│   └── eval_results.csv
+└── src/
+    └── uav_research_copilot/
+        ├── __init__.py
+        ├── config.py
+        ├── document_loader.py
+        ├── chunking.py
+        ├── vector_store.py
+        ├── prompts.py
+        ├── rag.py
+        └── evaluation.py
+```
 
-## Quick Start
+## Installation
 
-1. Put UAV research PDFs in `data/papers/`
-2. Install dependencies
-
+```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
+```
 
-3. Build the vector index
+## Usage
 
-python src/ingest.py
+### 1) Build the Vector Database
 
-4. Run the app
+```bash
+PYTHONPATH=src python ingest.py
+```
 
-streamlit run app.py
+This step loads all PDFs from `data/papers/`, creates chunks, computes embeddings, and saves:
 
-## Example Questions
+- `data/vector_store/index.npy`
+- `data/vector_store/metadata.json`
 
-- What acoustic features are used for UAV detection?
-- What datasets are used in UAV audio research?
-- What are limitations of microphone-based detection?
+### 2) Ask a Question from CLI
 
-Author: Roei Yanku
+```bash
+PYTHONPATH=src python rag_pipeline.py "What acoustic features are used for UAV detection?" --style precise
+```
+
+Supported prompt styles:
+
+- `precise`
+- `structured`
+
+### 3) Run Prompt-Style Evaluation
+
+```bash
+PYTHONPATH=src python evaluate.py
+```
+
+This writes evaluation results to:
+
+- `results/eval_results.csv`
+
+### 4) Launch Streamlit App
+
+```bash
+PYTHONPATH=src streamlit run app.py
+```
+
+The app shows:
+
+- file/index status
+- question input
+- answer output
+- retrieved source chunks
+
+## Clean Code Notes
+
+The codebase follows clean code principles by design:
+
+- **Small focused functions** in separate modules
+- **Centralized constants** in `config.py`
+- **Meaningful names** for modules/functions/variables
+- **Minimal duplication** across scripts via shared package code
+
+## Troubleshooting
+
+- If the app reports missing index, run `PYTHONPATH=src python ingest.py` first.
+- If PDF extraction quality is poor, try cleaner PDF sources or OCR-converted versions.
+
+## License
+
+This project is provided for educational/research workflows.
