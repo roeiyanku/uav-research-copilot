@@ -1,7 +1,3 @@
-langchain
-llama-index
-sentence-transformers
-faiss-cpu
+numpy
 pypdf
 streamlit
-pandas
