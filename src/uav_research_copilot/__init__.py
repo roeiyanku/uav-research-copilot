@@ -1,1 +1,0 @@
-"""UAV Research Copilot package."""
