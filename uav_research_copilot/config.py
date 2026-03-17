@@ -1,9 +1,10 @@
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data" / "papers"
 VECTOR_STORE_DIR = PROJECT_ROOT / "data" / "vector_store"
 RESULTS_DIR = PROJECT_ROOT / "results"
+EVAL_DATASET_PATH = PROJECT_ROOT / "data" / "evaluation" / "uav_eval_questions.json"
 
 CHUNK_SIZE = 900
 CHUNK_OVERLAP = 150

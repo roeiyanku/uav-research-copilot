@@ -2,15 +2,15 @@ import json
 
 import streamlit as st
 
-from uav_research_copilot.config import DATA_DIR, EMBEDDING_MODEL_NAME, VECTOR_STORE_DIR
-from uav_research_copilot.rag import RAGPipeline
+from uav_research_copilot.config import CHUNK_SIZE, DATA_DIR, EMBEDDING_MODEL_NAME, VECTOR_STORE_DIR
+from uav_research_copilot.rag import RAGPipeline, SUPPORTED_IMPLEMENTATIONS
 from uav_research_copilot.vector_store import LocalVectorStore
 
 
 @st.cache_resource
-def get_pipeline() -> RAGPipeline:
+def get_pipeline(implementation: str) -> RAGPipeline:
     store = LocalVectorStore(store_dir=VECTOR_STORE_DIR, embedding_model_name=EMBEDDING_MODEL_NAME)
-    return RAGPipeline(store)
+    return RAGPipeline(store, implementation=implementation)
 
 
 def get_index_status() -> dict:
@@ -26,6 +26,18 @@ def get_index_status() -> dict:
 def main() -> None:
     st.title("UAV Research Copilot")
     st.caption("Ask questions over local UAV research PDFs using retrieval-augmented generation.")
+
+    with st.sidebar:
+        st.header("Retrieval Settings")
+        implementation = st.selectbox(
+            "RAG implementation",
+            options=SUPPORTED_IMPLEMENTATIONS,
+            format_func=lambda item: "LangChain-like" if item == "langchain" else "LlamaIndex-like",
+            index=0,
+        )
+        top_k = st.slider("top_k", min_value=1, max_value=10, value=4)
+        chunk_size = st.slider("chunk_size", min_value=200, max_value=1500, value=CHUNK_SIZE, step=50)
+        show_prompt_comparison = st.checkbox("Show prompt comparison", value=True)
 
     status = get_index_status()
     total_pdfs = len(list(DATA_DIR.glob("*.pdf")))
@@ -44,11 +56,39 @@ def main() -> None:
     style = st.selectbox("Prompt style", ["precise", "structured"], index=0)
 
     if question:
-        pipeline = get_pipeline()
-        response = pipeline.answer(question=question, prompt_style=style)
+        pipeline = get_pipeline(implementation)
+        response = pipeline.answer(
+            question=question,
+            prompt_style=style,
+            top_k=top_k,
+            chunk_size=chunk_size,
+        )
 
         st.subheader("Answer")
+        st.caption(
+            f"Backend: {response['implementation']} | top_k={response['top_k']} | chunk_size={response['chunk_size']}"
+        )
         st.write(response["answer"])
+
+        if show_prompt_comparison:
+            st.subheader("Prompt Comparison")
+            precise_response = pipeline.answer(question=question, prompt_style="precise", top_k=top_k, chunk_size=chunk_size)
+            structured_response = pipeline.answer(
+                question=question,
+                prompt_style="structured",
+                top_k=top_k,
+                chunk_size=chunk_size,
+            )
+
+            left, right = st.columns(2)
+            with left:
+                st.markdown("**Precise Prompt**")
+                st.code(precise_response["prompt_used"], language="markdown")
+                st.write(precise_response["answer"])
+            with right:
+                st.markdown("**Structured Prompt**")
+                st.code(structured_response["prompt_used"], language="markdown")
+                st.write(structured_response["answer"])
 
         st.subheader("Source Chunks")
         for idx, chunk in enumerate(response["source_chunks"], start=1):

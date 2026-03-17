@@ -1,7 +1,7 @@
 import argparse
 
-from uav_research_copilot.config import EMBEDDING_MODEL_NAME, VECTOR_STORE_DIR
-from uav_research_copilot.rag import RAGPipeline
+from uav_research_copilot.config import CHUNK_SIZE, EMBEDDING_MODEL_NAME, VECTOR_STORE_DIR
+from uav_research_copilot.rag import RAGPipeline, SUPPORTED_IMPLEMENTATIONS
 from uav_research_copilot.vector_store import LocalVectorStore
 
 
@@ -9,11 +9,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Ask a question to UAV Research Copilot")
     parser.add_argument("question", type=str, help="Question over the paper collection")
     parser.add_argument("--style", type=str, default="precise", choices=["precise", "structured"])
+    parser.add_argument("--implementation", type=str, default="langchain", choices=SUPPORTED_IMPLEMENTATIONS)
+    parser.add_argument("--top-k", type=int, default=4)
+    parser.add_argument("--chunk-size", type=int, default=CHUNK_SIZE)
     args = parser.parse_args()
 
     vector_store = LocalVectorStore(store_dir=VECTOR_STORE_DIR, embedding_model_name=EMBEDDING_MODEL_NAME)
-    pipeline = RAGPipeline(vector_store)
-    response = pipeline.answer(question=args.question, prompt_style=args.style)
+    pipeline = RAGPipeline(vector_store, implementation=args.implementation)
+    response = pipeline.answer(
+        question=args.question,
+        prompt_style=args.style,
+        top_k=args.top_k,
+        chunk_size=args.chunk_size,
+    )
 
     print("\nAnswer:\n")
     print(response["answer"])

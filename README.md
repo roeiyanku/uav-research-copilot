@@ -11,6 +11,9 @@ A lightweight Python Retrieval-Augmented Generation (RAG) project for querying U
 - Runs a RAG question-answering pipeline and returns source chunks
 - Keeps prompt templates in a dedicated `prompts.py` module
 - Evaluates at least two prompt styles (`precise` vs `structured`)
+- Supports toggling between LangChain-like and LlamaIndex-like synthesis backends
+- Includes adjustable retrieval controls (`top_k`, `chunk_size`) in Streamlit
+- Ships with a 10-question UAV evaluation dataset
 - Saves evaluation output to `results/eval_results.csv`
 - Includes a Streamlit app for interactive QA and source inspection
 
@@ -74,6 +77,12 @@ Supported prompt styles:
 - `precise`
 - `structured`
 
+Additional CLI options:
+
+- `--implementation` (`langchain` or `llamaindex`)
+- `--top-k`
+- `--chunk-size`
+
 ### 3) Run Prompt-Style Evaluation
 
 ```bash
@@ -84,6 +93,8 @@ This writes evaluation results to:
 
 - `results/eval_results.csv`
 
+The evaluator reads 10 sample UAV questions from `data/evaluation/uav_eval_questions.json`.
+
 ### 4) Launch Streamlit App
 
 ```bash
@@ -93,8 +104,11 @@ PYTHONPATH=src streamlit run app.py
 The app shows:
 
 - file/index status
+- backend toggle (`LangChain-like` vs `LlamaIndex-like`)
+- retrieval settings panel (`top_k`, `chunk_size`)
 - question input
 - answer output
+- side-by-side prompt comparison view
 - retrieved source chunks
 
 ## Clean Code Notes
