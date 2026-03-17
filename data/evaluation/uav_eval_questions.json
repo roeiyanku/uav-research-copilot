@@ -1,0 +1,12 @@
+[
+  "What acoustic features are commonly used for UAV detection?",
+  "Which machine learning models are most used for UAV sound classification?",
+  "What are common limitations of acoustic UAV detection systems?",
+  "How does microphone array geometry affect UAV localization accuracy?",
+  "What role does spectrogram preprocessing play in UAV audio recognition?",
+  "How do weather conditions impact UAV acoustic sensing performance?",
+  "What datasets are frequently used for benchmarking UAV detection methods?",
+  "How is data augmentation applied in UAV acoustic classification studies?",
+  "What trade-offs exist between model accuracy and real-time inference for UAV monitoring?",
+  "What evaluation metrics are typically reported in UAV detection research?"
+]
