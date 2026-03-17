@@ -4,7 +4,7 @@ A lightweight Python Retrieval-Augmented Generation (RAG) project for querying U
 
 ## Demo
 
-![App Screenshot](assets/screenshot.png)
+![App Screenshot](assets/screenshot.PNG)
 
 ## Features
 
