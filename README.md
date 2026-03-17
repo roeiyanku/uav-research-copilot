@@ -2,6 +2,10 @@
 
 A lightweight Python Retrieval-Augmented Generation (RAG) project for querying UAV research papers stored as local PDFs.
 
+## Demo
+
+![App Screenshot](assets/app.png)
+
 ## Features
 
 - Loads PDF papers from `data/papers/`
